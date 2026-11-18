@@ -30,10 +30,7 @@ const joinKeyboard = new InlineKeyboard()
 
 async function isMember(ctx) {
   try {
-    const member = await ctx.api.getChatMember(
-      CHANNEL,
-      ctx.from.id
-    )
+    const member = await ctx.api.getChatMember(CHANNEL, ctx.from.id)
     return ["creator", "administrator", "member"].includes(member.status) ||
       (member.status === "restricted" && member.is_member)
   } catch {
@@ -70,6 +67,8 @@ function password() {
 export function registerCommands(bot) {
   bot.command("start", async (ctx) => {
     users.add(ctx.from.id)
+    if (!(await requireJoin(ctx))) return
+
     await ctx.reply(
       `👋 Welcome ${ctx.from.first_name}!\n\n✨ FAKE DATA GENERATOR\n\nনিচের বাটন থেকে পছন্দের ডেটা তৈরি করুন।`,
       { reply_markup: menu }
@@ -88,17 +87,13 @@ export function registerCommands(bot) {
     if (!ADMIN_ID || String(ctx.from.id) !== ADMIN_ID) {
       return ctx.reply("⛔ আপনি Admin নন।")
     }
-    await ctx.reply(
-      `👑 ADMIN PANEL\n\n👥 মোট ব্যবহারকারী: ${users.size}\n\nবট চালু আছে।`,
-    )
+    await ctx.reply(`👑 ADMIN PANEL\n\n👥 মোট ব্যবহারকারী: ${users.size}`)
   })
 
   bot.callbackQuery("check", async (ctx) => {
     await ctx.answerCallbackQuery()
     if (await isMember(ctx)) {
-      await ctx.reply("✅ Join সফল হয়েছে! এখন /start দিন।", {
-        reply_markup: menu
-      })
+      await ctx.reply("✅ Join সফল হয়েছে! এখন /start দিন।")
     } else {
       await ctx.reply("❌ আপনি এখনো চ্যানেলে Join করেননি।")
     }
@@ -125,9 +120,7 @@ export function registerCommands(bot) {
     if (!ADMIN_ID || String(ctx.from.id) !== ADMIN_ID) {
       return ctx.reply("⛔ Admin access denied.")
     }
-    await ctx.reply(
-      `👑 ADMIN PANEL\n\n👥 মোট ব্যবহারকারী: ${users.size}\n\n/status - Bot status`
-    )
+    await ctx.reply(`👑 ADMIN PANEL\n\n👥 মোট ব্যবহারকারী: ${users.size}`)
   })
 
   bot.command("status", async (ctx) => {
