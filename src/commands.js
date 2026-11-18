@@ -40,9 +40,8 @@ async function isMember(ctx) {
 
 async function requireJoin(ctx) {
   if (await isMember(ctx)) return true
-
   await ctx.reply(
-    "🔒 বট ব্যবহার করতে আগে আমাদের চ্যানেলে Join করুন।",
+    "🔒 আগে আমাদের চ্যানেলে Join করুন।",
     { reply_markup: joinKeyboard }
   )
   return false
@@ -68,9 +67,8 @@ export function registerCommands(bot) {
   bot.command("start", async (ctx) => {
     users.add(ctx.from.id)
     if (!(await requireJoin(ctx))) return
-
     await ctx.reply(
-      `👋 Welcome ${ctx.from.first_name}!\n\n✨ FAKE DATA GENERATOR\n\nনিচের বাটন থেকে পছন্দের ডেটা তৈরি করুন।`,
+      `👋 Welcome ${ctx.from.first_name}!\n\n✨ FAKE DATA GENERATOR\n\nনিচের বাটন থেকে ডেটা তৈরি করুন।`,
       { reply_markup: menu }
     )
   })
@@ -93,9 +91,9 @@ export function registerCommands(bot) {
   bot.callbackQuery("check", async (ctx) => {
     await ctx.answerCallbackQuery()
     if (await isMember(ctx)) {
-      await ctx.reply("✅ Join সফল হয়েছে! এখন /start দিন।")
+      await ctx.reply("✅ Join সফল! এবার /start দিন।")
     } else {
-      await ctx.reply("❌ আপনি এখনো চ্যানেলে Join করেননি।")
+      await ctx.reply("❌ আপনি এখনো Join করেননি।")
     }
   })
 
@@ -103,8 +101,7 @@ export function registerCommands(bot) {
     name: () => `👤 Fake Name: ${fakeName()}`,
     dob: () => `🎂 Random DOB: ${fakeDOB()}`,
     password: () => `🔐 Strong Password:\n${password()}`,
-    all: () =>
-      `🎲 FAKE DATA\n\n👤 Name: ${fakeName()}\n🎂 DOB: ${fakeDOB()}\n🔐 Password: ${password()}`
+    all: () => `🎲 FAKE DATA\n\n👤 Name: ${fakeName()}\n🎂 DOB: ${fakeDOB()}\n🔐 Password: ${password()}`
   }
 
   for (const [key, generate] of Object.entries(actions)) {
@@ -121,12 +118,5 @@ export function registerCommands(bot) {
       return ctx.reply("⛔ Admin access denied.")
     }
     await ctx.reply(`👑 ADMIN PANEL\n\n👥 মোট ব্যবহারকারী: ${users.size}`)
-  })
-
-  bot.command("status", async (ctx) => {
-    if (!ADMIN_ID || String(ctx.from.id) !== ADMIN_ID) {
-      return ctx.reply("⛔ Admin access denied.")
-    }
-    await ctx.reply(`✅ Bot is running\n👥 Users: ${users.size}`)
   })
 }
